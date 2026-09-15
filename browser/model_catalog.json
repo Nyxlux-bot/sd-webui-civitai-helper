@@ -1,0 +1,997 @@
+{
+  "schema": 1,
+  "source": {
+    "repository": "civitai/civitai",
+    "commit": "3d18e61eea15641cc00471744cbc7577d818ed0d",
+    "checked": "2026-09-16",
+    "files": [
+      "packages/civitai-shared/src/basemodel.constants.ts",
+      "packages/civitai-db-schema/src/enums.ts",
+      "src/server/common/enums.ts",
+      "src/server/schema/model.schema.ts"
+    ]
+  },
+  "models": [
+    {
+      "name": "Anima",
+      "family": "Anima",
+      "ecosystem": "Anima",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "AuraFlow",
+      "family": "AuraFlow",
+      "ecosystem": "AuraFlow",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Chroma",
+      "family": "Chroma",
+      "ecosystem": "Chroma",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "CogVideoX",
+      "family": "CogVideoX",
+      "ecosystem": "CogVideoX",
+      "media": [
+        "video"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Ernie",
+      "family": "Baidu",
+      "ecosystem": "Ernie",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Flux.1 S",
+      "family": "Black Forest Labs",
+      "ecosystem": "Flux1",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Flux.1 D",
+      "family": "Black Forest Labs",
+      "ecosystem": "Flux1",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Flux.1 Krea",
+      "family": "Black Forest Labs",
+      "ecosystem": "FluxKrea",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Flux.1 Kontext",
+      "family": "Black Forest Labs",
+      "ecosystem": "Flux1Kontext",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Flux.2 D",
+      "family": "Black Forest Labs",
+      "ecosystem": "Flux2",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Flux.2 Klein 9B",
+      "family": "Black Forest Labs",
+      "ecosystem": "Flux2Klein_9B",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Flux.2 Klein 9B-base",
+      "family": "Black Forest Labs",
+      "ecosystem": "Flux2Klein_9B_base",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Flux.2 Klein 4B",
+      "family": "Black Forest Labs",
+      "ecosystem": "Flux2Klein_4B",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Flux.2 Klein 4B-base",
+      "family": "Black Forest Labs",
+      "ecosystem": "Flux2Klein_4B_base",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Flux 3 Video",
+      "family": "Black Forest Labs",
+      "ecosystem": "Flux3Video",
+      "media": [
+        "video"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Grok",
+      "family": "xAI",
+      "ecosystem": "Grok",
+      "media": [
+        "image",
+        "video"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "HappyHorse",
+      "family": "Alibaba - Taotian",
+      "ecosystem": "HappyHorse",
+      "media": [
+        "video"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "HiDream",
+      "family": "HiDream",
+      "ecosystem": "HiDream",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "HiDream-O1",
+      "family": "HiDream",
+      "ecosystem": "HiDream-O1",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Hunyuan 1",
+      "family": "Tencent",
+      "ecosystem": "HyDit1",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Hunyuan Video",
+      "family": "Tencent",
+      "ecosystem": "HyV1",
+      "media": [
+        "video"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Ideogram 4.0",
+      "family": "Ideogram",
+      "ecosystem": "Ideogram",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Boogu",
+      "family": "Boogu",
+      "ecosystem": "Boogu",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Illustrious",
+      "family": "SDXL Community",
+      "ecosystem": "Illustrious",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Imagen4",
+      "family": "Google",
+      "ecosystem": "Imagen4",
+      "media": [
+        "image"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "Kolors",
+      "family": "Kolors",
+      "ecosystem": "Kolors",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Krea 2",
+      "family": "Krea AI",
+      "ecosystem": "Krea2",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "LTXV",
+      "family": "Lightricks",
+      "ecosystem": "LTXV",
+      "media": [
+        "video"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "LTXV2",
+      "family": "Lightricks",
+      "ecosystem": "LTXV2",
+      "media": [
+        "video"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "LTXV 2.3",
+      "family": "Lightricks",
+      "ecosystem": "LTXV23",
+      "media": [
+        "video"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "LTXV 2.5",
+      "family": "Lightricks",
+      "ecosystem": "LTXV25",
+      "media": [
+        "video"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Lens",
+      "family": "Lens",
+      "ecosystem": "Lens",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Lumina",
+      "family": "Lumina",
+      "ecosystem": "Lumina",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "MageFlow",
+      "family": "Microsoft",
+      "ecosystem": "MageFlow",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "MAI",
+      "family": "Microsoft",
+      "ecosystem": "MAI",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Mochi",
+      "family": "Mochi",
+      "ecosystem": "Mochi",
+      "media": [
+        "video"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Nano Banana",
+      "family": "Google",
+      "ecosystem": "NanoBanana",
+      "media": [
+        "image"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "NoobAI",
+      "family": "SDXL Community",
+      "ecosystem": "NoobAI",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "ODOR",
+      "family": "ODOR",
+      "ecosystem": "ODOR",
+      "media": [
+        "image"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "OpenAI",
+      "family": "OpenAI",
+      "ecosystem": "OpenAI",
+      "media": [
+        "image"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "Upscaler",
+      "family": "Upscaler",
+      "ecosystem": "Upscaler",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Other",
+      "family": "Other",
+      "ecosystem": "Other",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "PixArt a",
+      "family": "PixArt",
+      "ecosystem": "PixArtA",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "PixArt E",
+      "family": "PixArt",
+      "ecosystem": "PixArtE",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Playground v2",
+      "family": "Playground v2",
+      "ecosystem": "PlaygroundV2",
+      "media": [
+        "image"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "Pony",
+      "family": "Pony Diffusion",
+      "ecosystem": "Pony",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Pony V7",
+      "family": "Pony Diffusion",
+      "ecosystem": "PonyV7",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Qwen",
+      "family": "Alibaba",
+      "ecosystem": "Qwen",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Qwen 2",
+      "family": "Alibaba",
+      "ecosystem": "Qwen2",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Qwen 3",
+      "family": "Alibaba",
+      "ecosystem": "Qwen3",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Stable Cascade",
+      "family": "Stability AI",
+      "ecosystem": "SCascade",
+      "media": [
+        "image"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "SD 1.4",
+      "family": "Stability AI",
+      "ecosystem": "SD1",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "SD 1.5",
+      "family": "Stability AI",
+      "ecosystem": "SD1",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "SD 1.5 LCM",
+      "family": "Stability AI",
+      "ecosystem": "SD1",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "SD 1.5 Hyper",
+      "family": "Stability AI",
+      "ecosystem": "SD1",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "SD 2.0",
+      "family": "Stability AI",
+      "ecosystem": "SD2",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "SD 2.0 768",
+      "family": "Stability AI",
+      "ecosystem": "SD2",
+      "media": [
+        "image"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "SD 2.1",
+      "family": "Stability AI",
+      "ecosystem": "SD2",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "SD 2.1 768",
+      "family": "Stability AI",
+      "ecosystem": "SD2",
+      "media": [
+        "image"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "SD 2.1 Unclip",
+      "family": "Stability AI",
+      "ecosystem": "SD2",
+      "media": [
+        "image"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "SD 3",
+      "family": "Stability AI",
+      "ecosystem": "SD3",
+      "media": [
+        "image"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "SD 3.5",
+      "family": "Stability AI",
+      "ecosystem": "SD3",
+      "media": [
+        "image"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "SD 3.5 Large",
+      "family": "Stability AI",
+      "ecosystem": "SD3",
+      "media": [
+        "image"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "SD 3.5 Large Turbo",
+      "family": "Stability AI",
+      "ecosystem": "SD3",
+      "media": [
+        "image"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "SD 3.5 Medium",
+      "family": "Stability AI",
+      "ecosystem": "SD3_5M",
+      "media": [
+        "image"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "SDXL 0.9",
+      "family": "Stability AI",
+      "ecosystem": "SDXL",
+      "media": [
+        "image"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "SDXL 1.0",
+      "family": "Stability AI",
+      "ecosystem": "SDXL",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "SDXL 1.0 LCM",
+      "family": "Stability AI",
+      "ecosystem": "SDXL",
+      "media": [
+        "image"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "SDXL Lightning",
+      "family": "Stability AI",
+      "ecosystem": "SDXL",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "SDXL Hyper",
+      "family": "Stability AI",
+      "ecosystem": "SDXL",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "SDXL Turbo",
+      "family": "Stability AI",
+      "ecosystem": "SDXL",
+      "media": [
+        "image"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "SDXL Distilled",
+      "family": "Stability AI",
+      "ecosystem": "SDXLDistilled",
+      "media": [
+        "image"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "Reve",
+      "family": "Reve AI",
+      "ecosystem": "Reve",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Muse Image",
+      "family": "Meta",
+      "ecosystem": "MuseImage",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Seedream",
+      "family": "ByteDance",
+      "ecosystem": "Seedream",
+      "media": [
+        "image"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "SVD",
+      "family": "Stability AI",
+      "ecosystem": "SVD",
+      "media": [
+        "image"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "SVD XT",
+      "family": "Stability AI",
+      "ecosystem": "SVD",
+      "media": [
+        "image"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "Sora 2",
+      "family": "OpenAI",
+      "ecosystem": "Sora2",
+      "media": [
+        "video"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "Veo 3",
+      "family": "Google",
+      "ecosystem": "Veo3",
+      "media": [
+        "video"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "Wan Video",
+      "family": "Alibaba",
+      "ecosystem": "WanVideo",
+      "media": [
+        "video"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "Wan Video 1.3B t2v",
+      "family": "Alibaba",
+      "ecosystem": "WanVideo1_3B_T2V",
+      "media": [
+        "video"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Wan Video 14B t2v",
+      "family": "Alibaba",
+      "ecosystem": "WanVideo14B_T2V",
+      "media": [
+        "video"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Wan Video 14B i2v 480p",
+      "family": "Alibaba",
+      "ecosystem": "WanVideo14B_I2V_480p",
+      "media": [
+        "video"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Wan Video 14B i2v 720p",
+      "family": "Alibaba",
+      "ecosystem": "WanVideo14B_I2V_720p",
+      "media": [
+        "video"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Wan Video 2.2 TI2V-5B",
+      "family": "Alibaba",
+      "ecosystem": "WanVideo-22-TI2V-5B",
+      "media": [
+        "video"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Wan Video 2.2 I2V-A14B",
+      "family": "Alibaba",
+      "ecosystem": "WanVideo-22-I2V-A14B",
+      "media": [
+        "video"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Wan Video 2.2 T2V-A14B",
+      "family": "Alibaba",
+      "ecosystem": "WanVideo-22-T2V-A14B",
+      "media": [
+        "video"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Wan Video 2.5 T2V",
+      "family": "Alibaba",
+      "ecosystem": "WanVideo-25-T2V",
+      "media": [
+        "video"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Wan Video 2.5 I2V",
+      "family": "Alibaba",
+      "ecosystem": "WanVideo-25-I2V",
+      "media": [
+        "video"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Wan Image 2.7",
+      "family": "Alibaba",
+      "ecosystem": "WanImage27",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Wan Video 2.7",
+      "family": "Alibaba",
+      "ecosystem": "WanVideo27",
+      "media": [
+        "video"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Wan Video 3.0",
+      "family": "Alibaba",
+      "ecosystem": "WanVideo30",
+      "media": [
+        "video"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "ZImageTurbo",
+      "family": "Alibaba - Tongyi Lab",
+      "ecosystem": "ZImageTurbo",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "ZImageBase",
+      "family": "Alibaba - Tongyi Lab",
+      "ecosystem": "ZImageBase",
+      "media": [
+        "image"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Vidu Q1",
+      "family": "ShengShu Technology",
+      "ecosystem": "Vidu",
+      "media": [
+        "video"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "MiniMax H3",
+      "family": "Hailuo H3 by MiniMax",
+      "ecosystem": "MiniMaxH3",
+      "media": [
+        "video"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "Kling",
+      "family": "Kuaishou",
+      "ecosystem": "Kling",
+      "media": [
+        "video"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "Seedance",
+      "family": "Seedance",
+      "ecosystem": "Seedance",
+      "media": [
+        "video"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "ACE Audio",
+      "family": "ACE Audio",
+      "ecosystem": "Ace",
+      "media": [
+        "audio"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "MiniMax Music 3",
+      "family": "MiniMax Music 3",
+      "ecosystem": "MiniMaxMusic3",
+      "media": [
+        "audio"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "PolyGen",
+      "family": "PolyGen (Meshy)",
+      "ecosystem": "PolyGen",
+      "media": [
+        "image"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "Tripo",
+      "family": "Tripo",
+      "ecosystem": "Tripo",
+      "media": [
+        "image"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "Hunyuan3D",
+      "family": "Hunyuan3D",
+      "ecosystem": "Hunyuan3D",
+      "media": [
+        "image"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "Pixal3D",
+      "family": "Pixal3D",
+      "ecosystem": "Pixal3D",
+      "media": [
+        "image"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "Trellis.2",
+      "family": "Trellis.2",
+      "ecosystem": "Trellis2",
+      "media": [
+        "image"
+      ],
+      "hidden": true
+    }
+  ],
+  "model_types": [
+    "Checkpoint",
+    "TextualInversion",
+    "Hypernetwork",
+    "AestheticGradient",
+    "LORA",
+    "LoCon",
+    "DoRA",
+    "Controlnet",
+    "Upscaler",
+    "MotionModule",
+    "VAE",
+    "TextEncoder",
+    "UNet",
+    "CLIPVision",
+    "Poses",
+    "Wildcards",
+    "Workflows",
+    "ComfyWorkflows",
+    "Detection",
+    "VisionLanguage",
+    "CLIP",
+    "LLM",
+    "Other"
+  ],
+  "sort_options": [
+    "Highest Rated",
+    "Most Downloaded",
+    "Most Liked",
+    "Most Discussed",
+    "Most Collected",
+    "Most Images",
+    "Newest",
+    "Oldest"
+  ]
+}

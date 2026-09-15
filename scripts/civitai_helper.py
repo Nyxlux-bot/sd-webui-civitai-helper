@@ -15,6 +15,7 @@ from ch_lib import js_action_civitai
 from ch_lib import civitai
 from ch_lib import util
 from ch_lib import sections
+from ch_lib import labels
 from browser import browser
 
 # init
@@ -70,7 +71,7 @@ def on_ui_tabs():
 
     # Used by some elements to pass messages to python
     js_msg_txtbox = gr.Textbox(
-        label="Request Msg From Js",
+        label='前端请求消息',
         visible=False,
         lines=1,
         value="",
@@ -91,10 +92,10 @@ def on_ui_tabs():
             sections.get_model_info_by_url_section()
 
         with gr.Box(elem_classes="ch_box"):
-            gr.Markdown("### Download Model")
-            with gr.Tab("Single", elem_id="ch_dl_single_tab"):
+            gr.Markdown('### 下载模型')
+            with gr.Tab('单个下载', elem_id="ch_dl_single_tab"):
                 sections.download_section()
-            with gr.Tab("Batch Download"):
+            with gr.Tab('批量下载'):
                 sections.download_multiple_section()
 
         with gr.Box(elem_classes="ch_box"):
@@ -104,12 +105,12 @@ def on_ui_tabs():
             sections.check_new_versions_section(js_msg_txtbox)
 
         # ====Footer====
-        gr.HTML(f"<center>{util.SHORT_NAME} version: {util.VERSION}</center>")
+        gr.HTML(f"<center>模型助手 · 中文维护版 {util.VERSION}</center>")
 
         # ====hidden component for js, not in any tab====
         js_msg_txtbox.render()
         py_msg_txtbox = gr.Textbox(
-            label="Response Msg From Python",
+            label='后端响应消息',
             visible=False,
             lines=1,
             value="",
@@ -117,27 +118,27 @@ def on_ui_tabs():
         )
 
         js_open_url_btn = gr.Button(
-            value="Open Model Url",
+            value='打开模型网页',
             visible=False,
             elem_id="ch_js_open_url_btn"
         )
         js_add_trigger_words_btn = gr.Button(
-            value="Add Trigger Words",
+            value='添加触发词',
             visible=False,
             elem_id="ch_js_add_trigger_words_btn"
         )
         js_use_preview_prompt_btn = gr.Button(
-            value="Use Prompt from Preview Image",
+            value='使用预览图提示词',
             visible=False,
             elem_id="ch_js_use_preview_prompt_btn"
         )
         js_rename_card_btn = gr.Button(
-            value="Rename Card",
+            value='重命名模型',
             visible=False,
             elem_id="ch_js_rename_card_btn"
         )
         js_remove_card_btn = gr.Button(
-            value="Remove Card",
+            value='删除模型',
             visible=False,
             elem_id="ch_js_remove_card_btn"
         )
@@ -180,29 +181,27 @@ def on_ui_tabs():
 
         # the third parameter is the element id on html, with a "tab_" as prefix
         return (
-            (civitai_helper, "Civitai Helper", "civitai_helper"),
-            (civitai_helper_browser, "Civitai Helper Browser", "civitai_helper_browser")
+            (civitai_helper, "模型助手", "civitai_helper"),
+            (civitai_helper_browser, "模型浏览", "civitai_helper_browser")
         )
 
-    return ((civitai_helper, "Civitai Helper", "civitai_helper"),)
+    return ((civitai_helper, "模型助手", "civitai_helper"),)
 
 
 def on_ui_settings():
-    section = ('civitai_helper', "Civitai Helper")
+    section = ('civitai_helper', "模型助手")
     shared.opts.add_option(
         "ch_civiai_api_key",
         shared.OptionInfo(
             "",
             (
-                "API key for authenticating with Civitai. "
-                "This is required to download some models. "
-                "See Wiki for more details."
+                'Civitai（模型网站）访问密钥；部分模型下载需要身份验证。可在使用说明中查看获取方法。'
             ),
             gr.Textbox,
-            {"interactive": True, "max_lines": 1},
+            {"interactive": True, "max_lines": 1, "type": "password"},
             section=section
         ).link(
-            "Wiki",
+            "使用说明",
             "https://github.com/zixaphir/Stable-Diffusion-Webui-Civitai-Helper/wiki/Civitai-API-Key"
         )
     )
@@ -211,9 +210,7 @@ def on_ui_settings():
         shared.OptionInfo(
             False,
             (
-                "Use autoV3 hash when scanning for Civitai metadata. This skips the "
-                "model header, allowing the model data to be found if it changed by "
-                "another tool, such as SwarmUI"
+                '扫描时使用 autoV3（跳过文件头的哈希算法），便于识别被其他工具修改过元数据的模型。'
             ),
             gr.Checkbox,
             {"interactive": True},
@@ -224,9 +221,7 @@ def on_ui_settings():
         shared.OptionInfo(
             False,
             (
-                "Save LyCORIS models to Lora directory. Do not use this if you are on "
-                "older versions of webui or you use an extension that handles LyCORIS "
-                "models."
+                '将 LyCORIS（低秩适配模型）保存到低秩模型目录；使用旧版绘图界面或独立适配插件时请保持关闭。'
             ),
             gr.Checkbox,
             {"interactive": True},
@@ -237,10 +232,7 @@ def on_ui_settings():
         shared.OptionInfo(
             True,
             (
-                "Open model Url on the user's client side, rather than server side. "
-                "If you are running WebUI locally, disabling this may open URLs in your "
-                "default internet browser if it is different than the one you are running "
-                "WebUI in"
+                '在当前浏览器打开模型网页；关闭后由运行绘图服务的电脑打开。'
             ),
             gr.Checkbox,
             {"interactive": True},
@@ -251,9 +243,9 @@ def on_ui_settings():
         "ch_hide_buttons",
         shared.OptionInfo(
            [x for x, y in BUTTONS.items() if y],
-           "Hide checked Civitai Helper buttons on model cards",
+           '隐藏勾选的模型卡片操作',
            gr.CheckboxGroup,
-           {"choices": list(BUTTONS)},
+           {"choices": labels.choices(BUTTONS, labels.BUTTONS)},
            section=section
         )
    )
@@ -261,7 +253,7 @@ def on_ui_settings():
         "ch_always_display",
         shared.OptionInfo(
             False,
-            "Always Display Buttons on model cards",
+            '始终显示模型卡片操作按钮',
             gr.Checkbox,
             {"interactive": True},
             section=section
@@ -271,7 +263,7 @@ def on_ui_settings():
         "ch_max_size_preview",
         shared.OptionInfo(
             True,
-            "Download Max Size Preview",
+            '下载原尺寸预览图',
             gr.Checkbox,
             {"interactive": True},
             section=section
@@ -281,7 +273,7 @@ def on_ui_settings():
         "ch_download_examples",
         shared.OptionInfo(
             False,
-            "Download Example Images Locally",
+            '将示例图下载到本地',
             gr.Checkbox,
             {"interactive": True},
             section=section
@@ -291,16 +283,10 @@ def on_ui_settings():
         "ch_nsfw_threshold",
         shared.OptionInfo(
             list(civitai.NSFW_LEVELS.keys())[0], # Block NSFW
-            util.dedent(
-                """
-                Blocks images that are more NSFW than the chosen rating.
-                "XXX" allows all NSFW images unless Civitai changes their
-                rating system.
-                """
-            ).strip().replace("\n", " "),
+            "预览图片的最高分级；超过所选级别的图片不会展示或下载。",
             gr.Dropdown,
             {
-                "choices": list(civitai.NSFW_LEVELS.keys()),
+                "choices": labels.choices(civitai.NSFW_LEVELS, labels.RATINGS),
                 "interactive": True
             },
             section=section
@@ -310,10 +296,10 @@ def on_ui_settings():
         "ch_preview_nsfw_selection_behavior",
         shared.OptionInfo(
             "API Order (default)",
-            "Preview selection order within NSFW threshold.",
+            '符合图片分级上限时的预览选择顺序',
             gr.Dropdown,
             {
-                "choices": ["API Order (default)", "Lowest Rating First"],
+                "choices": [("网站默认顺序", "API Order (default)"), ("优先较低分级", "Lowest Rating First")],
                 "interactive": True
             },
             section=section
@@ -323,7 +309,7 @@ def on_ui_settings():
         "ch_dl_webui_metadata",
         shared.OptionInfo(
             True,
-            "Also add data for WebUI metadata editor",
+            '同时补充绘图界面的模型元数据',
             gr.Checkbox,
             {"interactive": True},
             section=section)
@@ -332,7 +318,7 @@ def on_ui_settings():
         "ch_proxy",
         shared.OptionInfo(
             "",
-            "Proxy to use for fetching models and model data. Format:  http://127.0.0.1:port",
+            '网络代理地址；填写完整的代理协议、主机和端口。留空使用默认网络。',
             gr.Textbox,
             {"interactive": True, "max_lines": 1},
             section=section)
@@ -341,7 +327,7 @@ def on_ui_settings():
         "ch_clean_html",
         shared.OptionInfo(
             False,
-            "Remove HTML from model description",
+            '清除模型说明中的网页格式',
             gr.Checkbox,
             {"interactive": True},
             section=section)
@@ -350,7 +336,7 @@ def on_ui_settings():
         "ch_civitai_browser",
         shared.OptionInfo(
             True,
-            "Add an interface for browsing Civitai and downloading models within WebUI",
+            '启用模型浏览与搜索页面',
             gr.Checkbox,
             {"interactive": True},
             section=section)
@@ -359,12 +345,12 @@ def on_ui_settings():
         "ch_image_metadata",
         shared.OptionInfo(
             False,
-            "Automatically add resource metadata to all generated images. Please see Wiki for details.",
+            '自动向生成图片写入模型资源信息，便于网站识别所用模型。详见使用说明。',
             gr.Checkbox,
             {"interactive": True},
             section=section
         ).link(
-            "Wiki",
+            "使用说明",
             "https://github.com/zixaphir/Stable-Diffusion-Webui-Civitai-Helper/wiki/Civitai-Resource-Metadata"
         )
     )
@@ -372,7 +358,7 @@ def on_ui_settings():
         "ch_set_file_timestamp",
         shared.OptionInfo(
             False,
-            "Set file timestamps based on model's createdAt metadata",
+            '将下载文件的时间设为模型创建时间',
             gr.Checkbox,
             {"interactive": True},
             section=section)

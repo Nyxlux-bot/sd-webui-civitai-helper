@@ -67,7 +67,7 @@ def scan_single_model(filepath, model_type, refetch_old, organize_models, delay)
 
     # check info file
     if model.metadata_needed(info_file, sd15_file, refetch_old):
-        output = f"Creating model info for: {filename}"
+        output = f"正在创建模型信息：{filename}"
         util.printD(output)
         yield output
 
@@ -82,7 +82,7 @@ def scan_single_model(filepath, model_type, refetch_old, organize_models, delay)
         util.printD(f"model action sha256: {sha256_hash}")
 
         if not sha256_hash:
-            output = f"failed generating SHA256 for model: {filename}"
+            output = f"无法计算模型哈希：{filename}"
             util.printD(output)
             yield output
             time.sleep(delay)
@@ -93,7 +93,7 @@ def scan_single_model(filepath, model_type, refetch_old, organize_models, delay)
         if use_auto_v3:
             civitai_hash = sha256_hash[:12]
 
-        yield "Requesting model information from Civitai"
+        yield "正在向模型网站获取信息"
         # use this sha256 to get model info from civitai
         model_info = civitai.get_model_info_by_hash(civitai_hash)
 
@@ -144,7 +144,7 @@ def scan_model(scan_model_types, refetch_old, organize_models=False, progress=gr
 
     # check model types
     if not scan_model_types:
-        output = "Model Types is None, can not scan."
+        output = "请先选择要扫描的模型类型。"
         util.printD(output)
         yield output
         return
@@ -222,7 +222,7 @@ def scan_model(scan_model_types, refetch_old, organize_models=False, progress=gr
             pass
 
     # this previously had an image count, but it always matched the model count.
-    output = f"Done. Successfully scanned {count[1]} of {len(models)} models."
+    output = f"扫描完成，成功处理 {count[1]} / {len(models)} 个模型。"
 
     util.printD(output)
 
@@ -308,7 +308,7 @@ def get_model_info_by_input(
     # is provided, prefer fetching that exact version.
     result = civitai.get_model_id_from_url(model_url_or_id, include_model_ver=True)
     if not result:
-        output = f"failed to parse model id from url: {model_url_or_id}"
+        output = f"无法从输入中识别模型编号：{model_url_or_id}"
         util.printD(output)
         yield output
         return
@@ -320,7 +320,7 @@ def get_model_info_by_input(
     model_path = model.get_model_path_by_type_and_name(model_type, model_name)
 
     if model_path is None:
-        output = "Could not get Model Path"
+        output = "无法获取本地模型路径。"
         util.printD(output)
         yield output
         return
@@ -333,7 +333,7 @@ def get_model_info_by_input(
         model_info = civitai.get_version_info_by_model_id(model_id)
 
     if not model_info:
-        output = f"failed to get model info from civitai for url: {model_url_or_id}"
+        output = f"无法获取此链接的模型信息：{model_url_or_id}"
         util.printD(output)
         yield output
         return
@@ -412,7 +412,7 @@ def check_models_new_version_to_md(model_types:list) -> str:
 
     if not new_versions:
         util.printD("Done: no new versions found.")
-        return "No models have new versions"
+        return "暂未发现模型新版本。"
 
     articles = []
     count = 0
@@ -420,7 +420,7 @@ def check_models_new_version_to_md(model_types:list) -> str:
         article = build_article_from_version(new_version)
         articles.append(article)
 
-    output = f"Found new versions for following models: <section>{''.join(articles)}</section>"
+    output = f"以下模型有新版本：<section>{''.join(articles)}</section>"
 
     count = index + 1
 
@@ -659,7 +659,7 @@ def download_files(filename, model_folder, ver_info, headers, filetypes, dl_all,
     # check if this model already exists
     result = civitai.search_local_model_info_by_version_id(model_folder, model_ids)
     if result:
-        output = f"This model version already exists at `{result}`"
+        output = f"此模型版本已存在：`{result}`"
         util.printD(output)
         yield (False, output)
 

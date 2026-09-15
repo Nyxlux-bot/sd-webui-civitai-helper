@@ -1,39 +1,4 @@
-SUPPORTED_MODELS = [
-    "Aura Flow",
-    "CogVideoX",
-    "Flux",
-    "Flux .1 S",
-    "Flux .1 D",
-    "Illustrious",
-    "Kolors",
-    "LTXV",
-    "Lumina",
-    "Mochi",
-    "Other",
-    "Pix Art a",
-    "PixArt Σ",
-    "Playground v2",
-    "Pony",
-    "SD 1.4",
-    "SD 1.5",
-    "SD 1.5 LCM",
-    "SD 2.0",
-    "SD 2.0 768",
-    "SD 2.1",
-    "SD 2.1 768",
-    "SD 2.1 Unclip",
-    "SD 3",
-    "SD 3.5",
-    "SD 3.5 Medium",
-    "SD 3.5 Large",
-    "SD 3.5 Large Turbo",
-    "SDXL 0.9",
-    "SDXL 1.0",
-    "SDXL 1.0 LCM",
-    "SDXL Distilled",
-    "SDXL Hyper",
-    "SDXL Lightning",
-    "SDXL Turbo",
-    "SVD",
-    "SVD XT"
-]
+"""Compatibility export; the catalogue is the single source of model names."""
+from .catalog import MODEL_RECORDS
+
+SUPPORTED_MODELS = [model["name"] for model in MODEL_RECORDS if not model["hidden"]]

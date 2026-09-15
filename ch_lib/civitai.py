@@ -11,11 +11,11 @@ from . import downloader
 SUFFIX = ".civitai"
 
 URLS = {
-    "query": "https://civitai.red/api/v1/models?",
-    "modelPage": "https://civitai.red/models/",
-    "modelId": "https://civitai.red/api/v1/models/",
-    "modelVersionId": "https://civitai.red/api/v1/model-versions/",
-    "hash": "https://civitai.red/api/v1/model-versions/by-hash/"
+    "query": "https://civitai.com/api/v1/models?",
+    "modelPage": "https://civitai.com/models/",
+    "modelId": "https://civitai.com/api/v1/models/",
+    "modelVersionId": "https://civitai.com/api/v1/model-versions/",
+    "hash": "https://civitai.com/api/v1/model-versions/by-hash/"
 }
 
 MODEL_TYPES = {
@@ -26,7 +26,11 @@ MODEL_TYPES = {
     "LoCon": "lycoris",
     "DoRA": "lora",
     "VAE": "vae",
-    "Upscaler": "upscaler"
+    "Upscaler": "upscaler",
+    "TextEncoder": "textencoder",
+    "UNet": "ckp",
+    "Controlnet": "controlnet",
+    "Detection": "detection",
 }
 
 MODEL_CATEGORIES = {
@@ -62,7 +66,7 @@ NSFW_LEVELS = {
 }
 
 
-def civitai_get(civitai_url: str):
+def civitai_get(civitai_url: str, **request_options):
     """
     Gets JSON from Civitai.
     return: dict:json or None
@@ -71,7 +75,7 @@ def civitai_get(civitai_url: str):
     util.printD(f"Requesting Civitai: {civitai_url}")
 
     success, response = downloader.request_get(
-        civitai_url
+        civitai_url, **request_options
     )
 
     if not success:

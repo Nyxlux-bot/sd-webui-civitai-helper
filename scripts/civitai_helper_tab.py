@@ -40,7 +40,7 @@ def _resources_html(tab_id: str = "") -> str:
     """Render the current pending list as an HTML snippet with per-item controls."""
     resources = extra_resources.get()
     if not resources:
-        return "<p style='color:gray;margin:4px 0'>No extra resources in list.</p>"
+        return "<p style='color:var(--body-text-color-subdued);margin:4px 0'>资源列表为空。</p>"
     rows = []
     for i, r in enumerate(resources):
         weight_html = ""
@@ -49,7 +49,7 @@ def _resources_html(tab_id: str = "") -> str:
             weight_html = (
                 f"<label style='display:flex;align-items:center;gap:3px;"
                 f"font-size:12px;flex-shrink:0'>"
-                f"Weight"
+                f"权重"
                 f"<input type='number' class='ch-extra-weight'"
                 f" data-idx='{i}' data-tab='{tab_id}'"
                 f" value='{w}' min='0' max='2' step='0.05'"
@@ -58,7 +58,7 @@ def _resources_html(tab_id: str = "") -> str:
                 f"border-radius:3px;"
                 f"background:var(--input-background-fill,#fff);"
                 f"color:var(--body-text-color,#000)'"
-                f" title='LoRA weight'>"
+                f" title='低秩模型权重'>"
                 f"</label>"
             )
         rows.append(
@@ -67,7 +67,7 @@ def _resources_html(tab_id: str = "") -> str:
             f"<span style='flex:1'>"
             f"<b>{r.get('modelName', '?')}</b> &ndash; {r.get('modelVersionName', '?')} "
             f"<span style='color:var(--body-text-color-subdued,gray)'>"
-            f"({r.get('type', '?')} &middot; version id: {r.get('modelVersionId', '?')})</span>"
+            f"({r.get('type', '?')} &middot; 版本编号：{r.get('modelVersionId', '?')})</span>"
             f"</span>"
             f"{weight_html}"
             f"<button class='ch-extra-rm' data-idx='{i}' data-tab='{tab_id}' "
@@ -75,7 +75,7 @@ def _resources_html(tab_id: str = "") -> str:
             f"background:var(--button-cancel-background-fill,#dc3545);"
             f"color:var(--button-cancel-text-color,#fff);"
             f"border:none;border-radius:3px;padding:2px 8px;font-size:12px;line-height:1.5' "
-            f"title='Remove'>&#x2715;</button>"
+            f"title='移除'>&#x2715;</button>"
             f"</div>"
         )
     return f"<div style='margin:4px 0'>{''.join(rows)}</div>"
@@ -220,11 +220,11 @@ def _picker_html(resource_type: str, tab_id: str, search: str = "", selected_pre
     try:
         items = _get_picker_items(resource_type, selected_preset)
     except Exception as exc:
-        return f"<p style='color:red;font-size:12px'>Error loading models: {exc}</p>"
+        return "<p style='color:var(--error-text-color);font-size:12px'>模型加载失败，请刷新后重试。</p>"
     if search:
         items = [(k, l, h) for k, l, h in items if search in l.lower()]
     if not items:
-        return "<p style='color:gray;font-size:12px;margin:4px 0'>No models found.</p>"
+        return "<p style='color:var(--body-text-color-subdued);font-size:12px;margin:4px 0'>未找到模型。</p>"
     rows = []
     for key, label, has_ci in items:
         mark = "\u2713" if has_ci else "\u2013"
@@ -235,7 +235,7 @@ def _picker_html(resource_type: str, tab_id: str, search: str = "", selected_pre
         disabled_attr = "" if has_ci else "disabled"
         cursor = "pointer" if has_ci else "not-allowed"
         opacity = "1" if has_ci else "0.35"
-        tip = "Add to extra resources" if has_ci else "Scan models in Civitai Helper tab first"
+        tip = "添加到资源列表" if has_ci else "请先在模型助手页面扫描此模型"
         rows.append(
             f"<div style='display:flex;align-items:center;gap:6px;padding:3px 2px;"
             f"border-bottom:1px solid var(--border-color-primary,#ddd)'>"
@@ -256,8 +256,8 @@ def _picker_html(resource_type: str, tab_id: str, search: str = "", selected_pre
     return (
         f"<div style='max-height:240px;overflow-y:auto'>{content}</div>"
         f"<p style='font-size:10px;color:var(--body-text-color-subdued,gray);margin:3px 0'>"
-        f"{len(items)} model(s) &nbsp;|&nbsp; \u2713 = has Civitai info &nbsp;|&nbsp;"
-        f" \u2013 = no info (scan first)</p>"
+        f"共 {len(items)} 个模型 &nbsp;|&nbsp; \u2713 已有模型信息 &nbsp;|&nbsp;"
+        f" \u2013 缺少信息（请先扫描）</p>"
     )
 
 
@@ -324,7 +324,7 @@ def _build_resource_from_key(resource_type: str, key: str) -> dict | None:
 class Script(scripts.Script):
 
     def title(self):
-        return "Civitai Helper"
+        return "模型资源助手"
 
     def show(self, is_img2img):
         return scripts.AlwaysVisible
@@ -333,41 +333,30 @@ class Script(scripts.Script):
         tab_id = "img2img" if is_img2img else "txt2img"
 
         with gr.Accordion(
-            label="Civitai Helper",
+            label='Civitai（模型助手）',
             open=False,
             elem_id=f"ch_extra_accordion_{tab_id}",
         ):
             with gr.Row():
                 enable_ckb = gr.Checkbox(
-                    label="Enable",
+                    label='启用',
                     value=extra_resources.get_enabled(),
                     elem_id=f"ch_extra_enable_{tab_id}",
                 )
             gr.HTML(
-                "<p style='margin:4px 0'>"
-                "Add Civitai models by URL. "
-                "These will be included in the <b>Civitai resources</b> metadata "
-                "of every image generated this session. "
-                "Use <b>Clear List</b> to remove them all."
-                "</p>"
-                "<p style='margin:6px 0 2px;font-size:0.9em;"
-                "color:var(--body-text-color-subdued,gray)'>"
-                "&#9432; Requires <b>Automatically add resource metadata to all generated images</b> "
-                "to be enabled in "
-                "<a class='ch_setting_link' href='#' style='color:var(--link-text-color,#1976d2)'>Settings &rsaquo; Civitai Helper</a>."
-                "</p>"
+                '<p>通过链接添加模型；这些资源会写入本次会话生成图片的资源信息中。点击“清空列表”可移除全部条目。</p><p>请先在<a class="ch_setting_link" href="#">设置 › 模型助手</a>中开启“自动向生成图片写入模型资源信息”。</p>'
             )
 
             with gr.Row():
                 url_input = gr.Textbox(
-                    label="Civitai Model URL",
+                    label='模型或模型版本链接',
                     placeholder="https://civitai.com/models/12345?modelVersionId=67890",
                     lines=1,
                     scale=4,
                     elem_id=f"ch_extra_url_{tab_id}",
                 )
                 fetch_btn = gr.Button(
-                    value="Fetch & Add",
+                    value='获取并添加',
                     variant="primary",
                     scale=1,
                     elem_id=f"ch_extra_fetch_{tab_id}",
@@ -385,40 +374,40 @@ class Script(scripts.Script):
 
             with gr.Row():
                 refresh_btn = gr.Button(
-                    value="Refresh List",
+                    value='刷新列表',
                     elem_id=f"ch_extra_refresh_{tab_id}",
                 )
                 clear_btn = gr.Button(
-                    value="Clear List",
+                    value='清空列表',
                     variant="stop",
                     elem_id=f"ch_extra_clear_{tab_id}",
                 )
 
-            with gr.Accordion("Browse & Add Local Models", open=False, elem_id=f"ch_picker_accordion_{tab_id}"):
+            with gr.Accordion('浏览并添加本地模型', open=False, elem_id=f"ch_picker_accordion_{tab_id}"):
                 picker_preset = gr.Dropdown(
-                    label="Preset Filter (Checkpoint/LoRA)",
+                    label='按底模预设筛选主模型与低秩模型',
                     choices=forge_presets.PresetArch.choices(),
                     value=_default_picker_preset(),
                     elem_id=f"ch_picker_preset_{tab_id}",
                 )
                 with gr.Tabs(elem_id=f"ch_picker_tabs_{tab_id}"):
-                    with gr.Tab("Checkpoints"):
-                        ckpt_search = gr.Textbox(placeholder="Filter by name...", show_label=False, lines=1, elem_id=f"ch_picker_search_checkpoint_{tab_id}")
+                    with gr.Tab('主模型'):
+                        ckpt_search = gr.Textbox(placeholder='按模型名称筛选…', show_label=False, lines=1, elem_id=f"ch_picker_search_checkpoint_{tab_id}")
                         ckpt_html = gr.HTML(value=_picker_html("checkpoint", tab_id, selected_preset=picker_preset.value), elem_id=f"ch_picker_html_checkpoint_{tab_id}")
                         ckpt_reload = gr.Button("Reload", elem_id=f"ch_picker_reload_checkpoint_{tab_id}")
 
-                    with gr.Tab("LoRA"):
-                        lora_search = gr.Textbox(placeholder="Filter by name...", show_label=False, lines=1, elem_id=f"ch_picker_search_lora_{tab_id}")
+                    with gr.Tab('LoRA（低秩模型）'):
+                        lora_search = gr.Textbox(placeholder='按模型名称筛选…', show_label=False, lines=1, elem_id=f"ch_picker_search_lora_{tab_id}")
                         lora_html = gr.HTML(value=_picker_html("lora", tab_id, selected_preset=picker_preset.value), elem_id=f"ch_picker_html_lora_{tab_id}")
                         lora_reload = gr.Button("Reload", elem_id=f"ch_picker_reload_lora_{tab_id}")
 
-                    with gr.Tab("Upscalers"):
-                        upscaler_search = gr.Textbox(placeholder="Filter by name...", show_label=False, lines=1, elem_id=f"ch_picker_search_upscaler_{tab_id}")
+                    with gr.Tab('放大模型'):
+                        upscaler_search = gr.Textbox(placeholder='按模型名称筛选…', show_label=False, lines=1, elem_id=f"ch_picker_search_upscaler_{tab_id}")
                         upscaler_html = gr.HTML(value=_picker_html("upscaler", tab_id), elem_id=f"ch_picker_html_upscaler_{tab_id}")
                         upscaler_reload = gr.Button("Reload", elem_id=f"ch_picker_reload_upscaler_{tab_id}")
 
-                    with gr.Tab("Embeddings"):
-                        embed_search = gr.Textbox(placeholder="Filter by name...", show_label=False, lines=1, elem_id=f"ch_picker_search_embedding_{tab_id}")
+                    with gr.Tab('文本嵌入模型'):
+                        embed_search = gr.Textbox(placeholder='按模型名称筛选…', show_label=False, lines=1, elem_id=f"ch_picker_search_embedding_{tab_id}")
                         embed_html = gr.HTML(value=_picker_html("embedding", tab_id), elem_id=f"ch_picker_html_embedding_{tab_id}")
                         embed_reload = gr.Button("Reload", elem_id=f"ch_picker_reload_embedding_{tab_id}")
 
@@ -427,21 +416,21 @@ class Script(scripts.Script):
             value="", visible=False, elem_id=f"ch_extra_rm_idx_{tab_id}"
         )
         rm_hidden_btn = gr.Button(
-            value="Remove", visible=False, elem_id=f"ch_extra_rm_btn_{tab_id}"
+            value='移除', visible=False, elem_id=f"ch_extra_rm_btn_{tab_id}"
         )
         # Hidden elements used by the inline JS weight inputs
         weight_data_txtbox = gr.Textbox(
             value="", visible=False, elem_id=f"ch_extra_weight_data_{tab_id}"
         )
         weight_hidden_btn = gr.Button(
-            value="Set Weight", visible=False, elem_id=f"ch_extra_weight_btn_{tab_id}"
+            value='设置权重', visible=False, elem_id=f"ch_extra_weight_btn_{tab_id}"
         )
         # Hidden elements for the Browse & Add picker
         picker_add_key_txtbox = gr.Textbox(
             value="", visible=False, elem_id=f"ch_picker_add_key_{tab_id}"
         )
         picker_add_btn = gr.Button(
-            value="Picker Add", visible=False, elem_id=f"ch_picker_add_btn_{tab_id}"
+            value='添加选中模型', visible=False, elem_id=f"ch_picker_add_btn_{tab_id}"
         )
 
         # ---- event handlers ------------------------------------------------
@@ -449,11 +438,11 @@ class Script(scripts.Script):
         def on_fetch(url):
             url = (url or "").strip()
             if not url:
-                return _resources_html(tab_id), "", "Please enter a Civitai URL."
+                return _resources_html(tab_id), "", "请输入模型链接。"
 
             result = civitai.get_model_id_from_url(url, include_model_ver=True)
             if not result:
-                return _resources_html(tab_id), "", "Could not parse a model ID from this URL."
+                return _resources_html(tab_id), "", "无法从链接中识别模型编号。"
 
             model_id, model_version_id = result
 
@@ -464,18 +453,18 @@ class Script(scripts.Script):
                 version_info = civitai.get_version_info_by_model_id(str(model_id))
 
             if not version_info:
-                return _resources_html(tab_id), "", "Failed to fetch model info from Civitai."
+                return _resources_html(tab_id), "", "获取模型信息失败，请检查链接或网络。"
 
             try:
                 resource = _build_resource_from_version_info(version_info)
             except (KeyError, TypeError) as exc:
-                return _resources_html(tab_id), "", f"Error parsing model info: {exc}"
+                return _resources_html(tab_id), "", "模型信息不完整，无法添加。"
 
             extra_resources.add(resource)
             return (
                 _resources_html(tab_id),
                 "",
-                f"Added: **{resource['modelName']}** &ndash; {resource['modelVersionName']}",
+                f"已添加：**{resource['modelName']}** &ndash; {resource['modelVersionName']}",
             )
 
         def on_remove_inline(idx_str):
@@ -487,7 +476,7 @@ class Script(scripts.Script):
 
         def on_clear():
             extra_resources.clear()
-            return _resources_html(tab_id), "List cleared."
+            return _resources_html(tab_id), "列表已清空。"
 
         fetch_btn.click(
             on_fetch,
@@ -554,19 +543,19 @@ class Script(scripts.Script):
                 resource_type = data["type"]
                 key = data["key"]
             except Exception:
-                return _resources_html(tab_id), "", "Invalid picker selection."
+                return _resources_html(tab_id), "", "所选模型无效。"
             resource = _build_resource_from_key(resource_type, key)
             if resource:
                 existing_ids = {r.get("modelVersionId") for r in extra_resources.get()}
                 if resource.get("modelVersionId") in existing_ids:
-                    return _resources_html(tab_id), "", f"Already in list: **{resource.get('modelName', key)}**"
+                    return _resources_html(tab_id), "", f"已在列表中：**{resource.get('modelName', key)}**"
                 extra_resources.add(resource)
                 return (
                     _resources_html(tab_id),
                     "",
-                    f"Added: **{resource['modelName']}** \u2013 {resource['modelVersionName']}",
+                    f"已添加：**{resource['modelName']}** \u2013 {resource['modelVersionName']}",
                 )
-            return _resources_html(tab_id), "", f"Could not load Civitai info for **{key}** ({resource_type})."
+            return _resources_html(tab_id), "", f"无法读取 **{key}** 的模型信息，请先扫描此模型。"
 
         picker_add_btn.click(
             on_picker_add,

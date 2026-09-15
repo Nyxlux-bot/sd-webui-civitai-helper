@@ -29,7 +29,7 @@ function ch_gradio_version() {
         return null;
     }
 
-    let version = versions.textContent.match(/gradio: +([\d.]+)/i)[1];
+    let version = versions.textContent.match(/gradio: +([\d.]+)/i)?.[1];
 
     return version || "unknown";
 }
@@ -317,7 +317,7 @@ window.remove_card = async function(e, model_type, search_term) {
     }
 
     // must confirm before removing
-    let rm_confirm = "\nConfirm to remove this model and all related files. This process is irreversible.";
+    let rm_confirm = "确认删除此模型及其相关文件？此操作不可撤销。";
     if (!confirm(rm_confirm)) {
         return status;
     }
@@ -378,7 +378,7 @@ window.rename_card = async function(e, model_type, search_term, model_name) {
     }
 
     // must confirm before removing
-    let rename_prompt = "\nRename this model to:";
+    let rename_prompt = "请输入新的模型名称：";
     let new_name = prompt(rename_prompt, model_name);
     if (!new_name) {
         return;
@@ -430,7 +430,14 @@ window.replace_preview = function(e, page, type, name) {
     stopEvent(e);
 
     // we have to create a whole hidden editor window to access preview replace functionality
-    extraNetworksEditUserMetadata(e, page, type, name);
+    // Forge resolves the model from the native edit button's parent card.
+    // Helper links are nested deeper, so forwarding their event loses the model name.
+    const editButton = e.currentTarget?.closest('.card')?.querySelector('.button-row .edit-button');
+    if (editButton) {
+        editButton.click();
+    } else {
+        extraNetworksEditUserMetadata(e, page, type, name);
+    }
 
     // the editor window takes quite some time to populate
     waitForEditor(page, type, name).then(editor => {
@@ -452,7 +459,7 @@ window.ch_dl_model_new_version = function(e, model_path, version_id, download_ur
     stopEvent(e);
 
     // must confirm before downloading
-    const dl_confirm = "\nConfirm to download.\n\nCheck Download Model Section's log and console log for detail.";
+    const dl_confirm = "确认下载此模型版本？下载进度会显示在模型助手页面。";
     if (!confirm(dl_confirm)) {
         return;
     }
@@ -496,25 +503,16 @@ window.ch_downloader = function(e, model_id) {
     // stop parent event
     stopEvent(e);
 
-    let tabs;
-
-    tabs = document.querySelectorAll("#tabs button");
-    for (let tab of tabs) {
-        let text = tab.textContent.trim();
-        if (text == "Civitai Helper") { // localization nightmare
-            tab.click();
-            break;
-        }
-    }
+    chSelectPanel("tab_civitai_helper");
 
     let single_dl_tab = document.getElementById("ch_dl_single_tab");
-    let ch_url = document.querySelector("#ch_dl_url input");
+    let ch_url = document.querySelector("#ch_dl_url input, #ch_dl_url textarea");
     let ch_get_info_btn = document.getElementById("ch_dl_get_info");
     let ch_download_btn = document.getElementById("ch_download_model_button");
     let old_active = document.querySelector(".ch_active_card");
     let new_active = document.getElementById(`ch_${model_id}_card`);
 
-    single_dl_tab.click();
+    chSelectPanel(single_dl_tab.id);
     ch_url.value = model_id;
     // gradio will not update input value without an input event
     ch_url.dispatchEvent(new Event("input", { bubbles: true }));
@@ -704,6 +702,7 @@ function getLongModelTypeFromShort(model_type_short) {
 
 let createUI = function() {
     const ul_node = document.createElement('ul');
+    ul_node.dataset.civitaiHelper = 'true';
 
     const template = document.createElement("a");
     template.href = "#";
@@ -711,37 +710,37 @@ let createUI = function() {
     // default mode
     const ch_buttons = {
         replace_preview_button: {
-            title: "Replace model preview with currently selected generated image",
+            title: "使用当前生成图片替换预览",
             icon: icons.replace_preview,
             className: "replacepreview",
             func: "replace_preview"
         },
         open_url_button: {
-            title: "Open this model's civitai url",
+            title: "打开模型网页",
             icon: icons.open_url,
             className: "openurl",
             func: "open_model_url"
         },
         add_trigger_words_button: {
-            title: "Add trigger words to prompt",
+            title: "添加模型触发词",
             icon: icons.add_trigger_words,
             className: "addtriggerwords",
             func: "add_trigger_words"
         },
         add_preview_prompt_button: {
-            title: "Use prompt from preview image",
+            title: "使用预览图的提示词",
             icon: icons.use_preview_prompt,
             className: "usepreviewprompt",
             func: "use_preview_prompt"
         },
         rename_model_button: {
-            title: "Rename this model and related files",
+            title: "重命名模型及相关文件",
             icon: icons.rename_model,
             className: "renamecard",
             func: "rename_card"
         },
         remove_model_button: {
-            title: "Remove this model and related files",
+            title: "删除模型及相关文件",
             icon: icons.remove_model,
             className: "removecard",
             func: "remove_card"
@@ -750,7 +749,7 @@ let createUI = function() {
 
     let children = {};
     for (const key in ch_buttons) {
-        if (opts.ch_hide_buttons.includes(key)) {
+        if ((opts.ch_hide_buttons || []).includes(key)) {
             continue;
         }
 
@@ -793,8 +792,7 @@ function processSingleCard(active_tab_type, active_extra_tab_type, card) {
     //additional node
     additional_node = card.querySelector(".actions .additional");
 
-    if (additional_node.querySelector("ul") != null) {
-        // buttons have already been added to this card.
+    if (!additional_node || additional_node.querySelector('ul[data-civitai-helper]')) {
         return;
     }
 
@@ -809,7 +807,7 @@ function processSingleCard(active_tab_type, active_extra_tab_type, card) {
     // search_term: /[subfolder path]/[model name].[ext] [hash]
     // get search_term
     let search_term_nodes = card.querySelectorAll(".actions .additional .search_term, .actions .additional .search_terms");
-    if (!search_term_nodes) {
+    if (!search_term_nodes.length) {
         console.log("can not find search_term node for cards in " + active_tab_type + "_" + active_extra_tab_type + "_cards");
         return;
     }
@@ -821,8 +819,8 @@ function processSingleCard(active_tab_type, active_extra_tab_type, card) {
         }
 
         let model_path = search_terms.join(" ");
-        let separator = model_path.match(/[\/\\]/)[0];
-        model_path = model_path.split(separator).slice(1).join(separator);
+        let separator = model_path.match(/[\/\\]/)?.[0];
+        if (separator) model_path = model_path.split(separator).slice(1).join(separator);
 
         search_term = model_path;
     } else {
@@ -831,14 +829,10 @@ function processSingleCard(active_tab_type, active_extra_tab_type, card) {
 
         // for whatever reason, sometimes search_terms will not include hashes.
         if (search_term_node.classList.contains("search_terms")) {
-            let separator = search_term.match(/[\/\\]/)[0];
-            search_term = search_term.split(separator).slice(1).join(
-                separator === "\\" ? "\\\\" : "/"
-            );
+            let separator = search_term.match(/[\/\\]/)?.[0];
+            if (separator) search_term = search_term.split(separator).slice(1).join(separator);
         }
     }
-
-    search_term = search_term.replaceAll("\\", "\\\\").replace("'", "\\'");
 
     if (!search_term) {
         console.log("search_term is empty for cards in " + active_tab_type + "_" + active_extra_tab_type + "_cards");
@@ -847,124 +841,205 @@ function processSingleCard(active_tab_type, active_extra_tab_type, card) {
 
     let page = active_tab_type;
     let type = getLongModelTypeFromShort(model_type);
-    let name = card.dataset.name.replace("'", "\\'");
+    let name = card.dataset.name || card.querySelector('.name')?.textContent || '';
 
     const children = nodes.children;
     for (const key in children) {
         const child = children[key];
         if (child.func == "replace_preview") {
-            child.el.setAttribute("onclick", `${child.func}(event, '${page}', '${type}', '${name}')`);
+            child.el.onclick = event => window[child.func](event, page, type, name);
             continue;
         }
         if (child.func == "rename_card") {
-            child.el.setAttribute("onclick", `${child.func}(event, '${model_type}', '${search_term}', '${name}')`);
+            child.el.onclick = event => window[child.func](event, model_type, search_term, name);
             continue;
         }
-        child.el.setAttribute("onclick", `${child.func}(event, '${model_type}', '${search_term}')`);
+        child.el.onclick = event => window[child.func](event, model_type, search_term);
     }
 
+    // Old Lobe versions insert an empty list and a preview link without a handler.
+    // Those are placeholders, not initialized Civitai Helper controls.
+    for (const old of additional_node.querySelectorAll('ul')) old.remove();
+    for (const old of additional_node.querySelectorAll(':scope > a')) {
+        if (!old.getAttribute('onclick') && !old.onclick && !old.getAttribute('href')) old.remove();
+    }
     additional_node.appendChild(ul_node);
 }
+
+const cardActionIcons = {
+    'copy-path-button': '<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+    'metadata-button': '<circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v.01"/>',
+    'edit-button': '<path d="m16 3 5 5-12 12H4v-5Zm-3 3 5 5"/>',
+    replacepreview: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8" cy="8" r="1"/><path d="m3 16 5-5 4 4 4-7 5 8"/>',
+    openurl: '<circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/>',
+    addtriggerwords: '<path d="m15 3 2 5 5 2-5 2-2 5-2-5-5-2 5-2ZM4 15v6m-3-3h6"/>',
+    usepreviewprompt: '<path d="M20 13 13 20a2 2 0 0 1-3 0L3 13V3h10l7 7a2 2 0 0 1 0 3Z"/><circle cx="7.5" cy="7.5" r=".5"/>',
+    renamecard: '<path d="m16 3 5 5-12 12H4v-5Zm-3 3 5 5"/>',
+    removecard: '<path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7"/>',
+};
+
+function chSelectPanel(id) {
+    const panel = document.getElementById(id);
+    if (!panel?.parentElement) return;
+    const parent = panel.parentElement;
+    const panels = [...parent.children].filter(node => node.classList.contains('tabitem'));
+    const buttons = parent.querySelectorAll(':scope > .tab-nav button');
+    buttons[panels.indexOf(panel)]?.click();
+}
+const cardActionLabels = {
+    'copy-path-button': '复制模型路径',
+    'metadata-button': '查看元数据',
+    'edit-button': '编辑模型信息',
+    replacepreview: '使用当前生成图作预览',
+    openurl: '打开模型网页',
+    addtriggerwords: '添加触发词',
+    usepreviewprompt: '使用预览图提示词',
+    renamecard: '重命名模型',
+    removecard: '删除模型及相关文件',
+};
+const actionSvg = paths => '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + paths + '</svg>';
+const chineseUI = () => true;
+let cardMenu = null;
+let menuTrigger = null;
+
+function closeCardMenu(restoreFocus = false) {
+    if (cardMenu) cardMenu.hidden = true;
+    if (menuTrigger) {
+        menuTrigger.setAttribute('aria-expanded', 'false');
+        if (restoreFocus && menuTrigger.isConnected) menuTrigger.focus();
+    }
+    menuTrigger = null;
+}
+
+function openCardMenu(event, card, trigger) {
+    stopEvent(event);
+    if (menuTrigger === trigger && cardMenu && !cardMenu.hidden) {
+        closeCardMenu(true);
+        return;
+    }
+    closeCardMenu();
+    if (!cardMenu) {
+        cardMenu = document.createElement('div');
+        cardMenu.id = 'ch-lobe-card-menu';
+        cardMenu.className = 'ch-lobe-card-menu';
+        cardMenu.setAttribute('role', 'menu');
+        cardMenu.addEventListener('click', e => e.stopPropagation());
+        cardMenu.addEventListener('keydown', e => {
+            const items = [...cardMenu.querySelectorAll('[role="menuitem"]')];
+            const index = items.indexOf(document.activeElement);
+            const keys = { ArrowDown: (index + 1) % items.length, ArrowUp: (index - 1 + items.length) % items.length, Home: 0, End: items.length - 1 };
+            if (e.key in keys) {
+                e.preventDefault();
+                items[keys[e.key]]?.focus();
+            } else if (e.key === 'Escape') {
+                stopEvent(e);
+                closeCardMenu(true);
+            } else if (e.key === 'Tab') {
+                closeCardMenu(true);
+            }
+        });
+        document.body.appendChild(cardMenu);
+    }
+    cardMenu.replaceChildren();
+    const heading = document.createElement('div');
+    heading.className = 'ch-lobe-card-menu-name';
+    heading.textContent = card.dataset.name || card.querySelector('.name')?.textContent || '';
+    cardMenu.appendChild(heading);
+    cardMenu.setAttribute('aria-label', heading.textContent);
+    const sourceActions = card.querySelectorAll('.button-row .card-button, .additional ul[data-civitai-helper] a');
+    for (const source of sourceActions) {
+        const kind = Object.keys(cardActionLabels).find(key => source.classList.contains(key));
+        const item = document.createElement('button');
+        item.type = 'button';
+        item.setAttribute('role', 'menuitem');
+        item.tabIndex = -1;
+        if (kind === 'removecard') item.classList.add('ch-destructive');
+        item.innerHTML = actionSvg(cardActionIcons[kind] || cardActionIcons['metadata-button']);
+        const label = document.createElement('span');
+        label.textContent = (chineseUI() && cardActionLabels[kind]) || source.title || source.textContent;
+        item.appendChild(label);
+        item.addEventListener('click', e => {
+            stopEvent(e);
+            closeCardMenu(true);
+            // Keep the original card context and the Helper's existing confirmation dialogs.
+            source.click();
+        });
+        cardMenu.appendChild(item);
+    }
+    menuTrigger = trigger;
+    cardMenu.hidden = false;
+    const rect = trigger.getBoundingClientRect();
+    const width = cardMenu.offsetWidth;
+    const height = cardMenu.offsetHeight;
+    cardMenu.style.left = `${Math.max(8, Math.min(rect.right - width, window.innerWidth - width - 8))}px`;
+    cardMenu.style.top = `${Math.max(8, Math.min(rect.bottom + 6, window.innerHeight - height - 8))}px`;
+    trigger.setAttribute('aria-expanded', 'true');
+    cardMenu.querySelector('[role="menuitem"]')?.focus();
+}
+
+function adaptLobeCard(card) {
+    const inSidebar = card.closest('#txt2img-extra-network-sidebar, #img2img-extra-network-sidebar');
+    card.classList.toggle('ch-lobe-card', !!inSidebar);
+    if (!inSidebar || card.querySelector('.ch-card-menu-toggle')) return;
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'ch-card-menu-toggle';
+    trigger.title = chineseUI() ? '模型操作' : 'Model actions';
+    trigger.setAttribute('aria-label', trigger.title);
+    trigger.setAttribute('aria-haspopup', 'menu');
+    trigger.setAttribute('aria-controls', 'ch-lobe-card-menu');
+    trigger.setAttribute('aria-expanded', 'false');
+    trigger.innerHTML = actionSvg('<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>');
+    trigger.addEventListener('click', event => openCardMenu(event, card, trigger));
+    card.appendChild(trigger);
+    const name = card.querySelector('.name');
+    if (name) name.title = card.dataset.name || name.textContent;
+}
+
+// Stable IDs work in Gradio 4 even when Lobe moves the tabs into its sidebar.
+// Use our own marker: a theme's empty <ul> does not mean the controls exist.
+window.ch_refresh_cards = function() {
+    for (const prefix of ['txt2img', 'img2img']) {
+        for (const type of ['textual_inversion', 'hypernetworks', 'checkpoints', 'lora', 'lycoris']) {
+            const container = getModelCardsEl(prefix, type);
+            if (!container) continue;
+            for (const card of container.querySelectorAll('.card')) {
+                processSingleCard(prefix, getShortModelTypeFromFull(type), card);
+                adaptLobeCard(card);
+            }
+        }
+    }
+};
 
 onUiLoaded(() => {
     //get gradio version
     const gradio_ver = ch_gradio_version();
     console.log(`Running Stable-Diffusion-Webui-Civitai-Helper on Gradio Version: ${gradio_ver}`);
 
-    // console.log(window.opts);
-    // createUI = createUI();
-
-    // get all extra network tabs
-    const tab_prefix_list = ["txt2img", "img2img"];
-    const model_type_list = ["textual_inversion", "hypernetworks", "checkpoints", "lora", "lycoris"];
-
-    // update extra network tab pages' cards
-    // * replace "replace preview" text button into the icon from `icons.replace_preview`.
-    // * add 3 button to each card:
-    //  - open model url:               `icons.open_url`
-    //  - add trigger words:            `icons.add_trigger_words`
-    //  - use preview image's prompt    `icons.use_preview_prompt`
-    //
-    // notice: javascript can not get response from python side
-    // so, these buttons just sent request to python
-    // then, python side gonna open url and update prompt text box, without telling js side.
-    function update_card_for_civitai() {
-        replace_preview_text = getTranslation("replace preview");
-
-        if (!replace_preview_text) {
-            replace_preview_text = "replace preview";
-        }
-
-        let extra_network_node = null;
-        let model_type = "";
-        let cards = null;
-
-        //get current tab
-        let active_tab_type = getActiveTabType();
-        if (!active_tab_type) {active_tab_type = "txt2img";}
-
-        for (const tab_prefix of tab_prefix_list) {
-            if (tab_prefix != active_tab_type) {
-                continue;
-            }
-
-            //get active extratab
-            const re = new RegExp(`${tab_prefix}_(.+)_cards_html$`);
-            const active_extra_tab = Array.from(get_uiCurrentTabContent().querySelectorAll('.extra-network-cards'))
-                .find(el => el.closest('.tabitem').style.display === 'block')
-                ?.id.match(re)[1];
-
-            const active_extra_tab_type = getShortModelTypeFromFull(active_extra_tab);
-
-            for (const js_model_type of model_type_list) {
-                //get model_type for python side
-                model_type = getShortModelTypeFromFull(js_model_type);
-
-                if (!model_type) {
-                    console.log(`Can not get model_type from: ${js_model_type}`);
-                    continue;
-                }
-
-                //only handle current sub-tab
-                if (model_type != active_extra_tab_type) {
-                    continue;
-                }
-
-                extra_network_node = getModelCardsEl(tab_prefix, js_model_type);
-
-                // get all card nodes
-                cards = extra_network_node.querySelectorAll(".card");
-                for (const card of cards) {
-                    // don't let an issue with a single card kill functionality for following cards
-                    try {
-                        processSingleCard(active_tab_type, active_extra_tab_type, card);
-                    } catch(err) {
-                        console.log(err);
-                    }
-                }
-            }
-        }
-    }
-
-    //add refresh button to extra network's toolbar
-    for (const prefix of tab_prefix_list) {
-        const extra_tab = getExtraTabs(prefix);
-        const headers = extra_tab.firstChild.children;
-
-        for (const header of headers) {
-            const model_type = header.textContent.trim().replace(" ", "_").toLowerCase();
-
-            let extraNetworksClick = () => {
-                waitForExtraTabs(prefix, [model_type]);
-                header.removeEventListener("click", extraNetworksClick);
-            };
-
-            header.addEventListener("click", extraNetworksClick);
-        }
-    }
-
-    //run it once
-    update_card_for_civitai();
+    window.ch_refresh_cards();
+    let scheduled = false;
+    const root = gradioApp();
+    const observer = new MutationObserver(records => {
+        const relevant = records.some(record => [...record.addedNodes].some(node =>
+            node.nodeType === 1 && (node.matches('.card, .extra-network-cards, .extra-networks, [id$="-extra-network-sidebar"]') ||
+                node.querySelector('.extra-network-cards, .card'))
+        ));
+        if (!relevant || scheduled) return;
+        scheduled = true;
+        requestAnimationFrame(() => {
+            scheduled = false;
+            window.ch_refresh_cards();
+            if (menuTrigger && !menuTrigger.isConnected) closeCardMenu();
+        });
+    });
+    observer.observe(root, { childList: true, subtree: true });
+    document.addEventListener('pointerdown', event => {
+        if (cardMenu && !cardMenu.contains(event.target) && !event.target.closest('.ch-card-menu-toggle')) closeCardMenu();
+    });
+    window.addEventListener('resize', () => closeCardMenu());
+    document.addEventListener('scroll', event => {
+        if (cardMenu && !cardMenu.contains(event.target)) closeCardMenu();
+    }, true);
 
     // Inline remove buttons for the "Civitai Extra Resources" accordion
     document.addEventListener('click', function(e) {
@@ -1033,8 +1108,8 @@ onUiLoaded(() => {
             e.preventDefault();
             e.stopPropagation();
 
-            document.getElementById('tab_settings-button').click();
-            document.getElementById('settings_civitai_helper-button').click();
+            chSelectPanel('tab_settings');
+            chSelectPanel('settings_civitai_helper');
 
             return false;
         });

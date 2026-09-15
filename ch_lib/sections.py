@@ -10,39 +10,39 @@ from . import model_action_civitai
 from . import civitai
 from . import duplicate_check
 from . import util
+from . import labels
 
 model_types = list(model.folders.keys())
+model_type_choices = labels.choices(model_types, labels.LOCAL_TYPES)
 
 def scan_models_section():
     """ Scan Models Section """
     with gr.Row():
-        gr.Markdown("### Scan Models for Civitai")
+        gr.Markdown('### 扫描并补全模型信息')
     with gr.Row():
         with gr.Column():
             scan_model_types_drop = gr.CheckboxGroup(
-                choices=model_types,
-                label="Model Types",
+                choices=model_type_choices,
+                label='模型类型',
                 value=model_types
             )
     with gr.Row():
         with gr.Column():
             organize_models = gr.Checkbox(
-                label="Move models into category folders",
+                label='按模型类别整理到子目录',
                 value=False,
                 elem_id="organize_models"
             )
             refetch_old_ckb = gr.Checkbox(
-                label="Replace Old Metadata Formats*",
+                label='替换旧版元数据格式',
                 value=False,
                 elem_id="ch_refetch_old_ckb"
             )
-            gr.HTML("""
-                * [<a href=https://github.com/zixaphir/Stable-Diffusion-Webui-Civitai-Helper/wiki/Metadata-Format-Changes>wiki</a>] Do not use this option if you have made changes with the metadata editor without backing up your data!!<br><br>
-                """)
+            gr.HTML('<p>替换旧格式可能覆盖手动编辑的元数据，使用前请备份。<a href="https://github.com/zixaphir/Stable-Diffusion-Webui-Civitai-Helper/wiki/Metadata-Format-Changes">格式变更说明</a></p>')
 
         with gr.Column():
             scan_model_civitai_btn = gr.Button(
-                value="Scan",
+                value='开始扫描',
                 variant="primary",
                 elem_id="ch_scan_model_civitai_btn"
             )
@@ -55,7 +55,7 @@ def scan_models_section():
 
     with gr.Row():
         scan_model_log_md = gr.Markdown(
-            value="Scanning takes time, just wait. Check console log for details",
+            value='点击扫描后将在此显示进度；详细信息可在运行窗口查看。',
             elem_id="ch_scan_model_log_md"
         )
 
@@ -87,20 +87,20 @@ def get_model_info_by_url_section():
     no_info_model_names = civitai.get_model_names_by_input("ckp", False)
 
     with gr.Column():
-        gr.Markdown("### Get Model Info from Civitai by URL")
-        gr.Markdown("Use this when scanning can not find a local model on civitai")
+        gr.Markdown('### 通过链接关联模型')
+        gr.Markdown('自动扫描无法识别本地模型时，可通过模型链接手动关联。')
         with gr.Row():
             with gr.Column(scale=2):
                 model_type_drop = gr.Dropdown(
-                    choices=model_types,
-                    label="Model Type",
+                    choices=model_type_choices,
+                    label='模型类型',
                     value="ckp",
                     multiselect=False,
                     elem_classes="ch_vpadding"
                 )
             with gr.Column(scale=1):
                 empty_info_only_ckb = gr.Checkbox(
-                    label="Only Show Models have no Info",
+                    label='只显示缺少信息的模型',
                     value=False,
                     elem_id="ch_empty_info_only_ckb",
                     elem_classes="ch_vpadding"
@@ -109,20 +109,20 @@ def get_model_info_by_url_section():
             with gr.Column(scale=2):
                 model_name_drop = gr.Dropdown(
                     choices=no_info_model_names,
-                    label="Model",
+                    label='模型',
                     value="",
                     multiselect=False
                 )
         with gr.Row():
             with gr.Column(scale=2, elem_classes="justify-bottom"):
                 model_url_or_id_txtbox = gr.Textbox(
-                    label="Civitai URL",
+                    label='模型链接或编号',
                     lines=1,
                     value=""
                 )
             with gr.Column(scale=1, elem_classes="justify-bottom"):
                 get_civitai_model_info_by_id_btn = gr.Button(
-                    value="Get Model Info from Civitai",
+                    value='获取模型信息',
                     variant="primary"
                 )
 
@@ -210,12 +210,12 @@ def download_section():
     def get_model_info_by_url(url, subfolder):
         result = civitai.get_model_id_from_url(url, include_model_ver=True)
         if not result:
-            return None
+            raise gr.Error("请输入有效的模型链接或编号。")
         model_id, model_version_id = result
         data = model_action_civitai.get_model_info_by_id(model_id)
 
         if not data:
-            return None
+            raise gr.Error("无法获取可下载的模型版本。请检查链接、访问凭据，或在模型网页确认此模型类型是否可用于当前绘图界面。")
 
         state = {
             "model_info": {},
@@ -452,46 +452,45 @@ def download_section():
     with gr.Row():
         with gr.Column(scale=2, elem_id="ch_dl_model_inputs"):
 
-            gr.Markdown(value="**1. Add URL and retrieve Model Info**")
+            gr.Markdown(value='**1. 输入链接并获取模型信息**')
 
             with gr.Row():
                 with gr.Column(scale=2, elem_classes="justify-bottom"):
                     dl_model_url_or_id_txtbox = gr.Textbox(
-                        label="Civitai URL",
+                        label='模型链接或编号',
                         lines=1,
                         max_lines=1,
                         value="",
-                        placeholder="Model URL or Model ID",
+                        placeholder='输入模型链接或编号',
                         elem_id="ch_dl_url"
                     )
                 with gr.Column(elem_classes="justify-bottom"):
                     dl_model_info_btn = gr.Button(
-                        value="Get Model Info by Civitai Url",
+                        value='获取模型信息',
                         variant="primary",
                         elem_id="ch_dl_get_info"
                     )
 
-            gr.Markdown(value="**2. Pick Subfolder and Model Version**")
+            gr.Markdown(value='**2. 选择保存位置与模型版本**')
 
             with gr.Row(elem_classes="ch_grid"):
                 dl_model_name_txtbox = gr.Textbox(
-                    label="Model Name",
+                    label='模型名称',
                     interactive=False,
                     lines=1,
                     max_lines=1,
                     min_width=320,
                     value=""
                 )
-                dl_model_type_txtbox = gr.Textbox(
-                    label="Model Type",
+                dl_model_type_txtbox = gr.Dropdown(
+                    choices=model_type_choices,
+                    label='模型类型',
                     interactive=False,
-                    lines=1,
-                    max_lines=1,
                     min_width=320,
-                    value=""
+                    value=None,
                 )
                 dl_base_model_txtbox = gr.Textbox(
-                    label="Base Model",
+                    label='训练底模',
                     interactive=False,
                     lines=1,
                     max_lines=1,
@@ -500,22 +499,22 @@ def download_section():
                 )
                 dl_version_drop = gr.Dropdown(
                     choices=[],
-                    label="Model Version",
+                    label='模型版本',
                     value="",
                     min_width=320,
                     multiselect=False
                 )
                 dl_subfolder_drop = gr.Dropdown(
                     choices=[],
-                    label="Sub-folder",
+                    label='保存子目录',
                     value="",
                     min_width=320,
                     allow_custom_value=True,
                     multiselect=False
                 )
                 dl_duplicate_drop = gr.Dropdown(
-                    choices=["Skip", "Overwrite", "Rename New"],
-                    label="Duplicate File Behavior",
+                    choices=[("跳过", "Skip"), ("覆盖", "Overwrite"), ("为新文件重命名", "Rename New")],
+                    label='遇到同名文件时',
                     value="Skip",
                     min_width=320,
                     multiselect=False
@@ -527,7 +526,7 @@ def download_section():
             ) as files_row:
 
                 with gr.Row(variant="compact"):
-                    gr.Markdown("**Files**")
+                    gr.Markdown('**下载文件**')
 
                 ch_output_add = []
                 ch_dl_model_types = []
@@ -552,7 +551,7 @@ def download_section():
                             elems["txtbx"] = gr.Textbox(
                                 value="",
                                 interactive=False,
-                                label=filetype,
+                                label=labels.FILES.get(filetype, filetype),
                                 max_lines=1,
                                 min_width=0
                             )
@@ -570,7 +569,7 @@ def download_section():
                     elems["txtbx"] = gr.Textbox(
                         value="",
                         interactive=False,
-                        label="Unhandled Files (Files that we don't know what to do with but will still downloaded with \"Download All Files\")",
+                        label='其他附属文件（勾选“下载全部文件”时一并保存）',
                     )
 
                     ch_output_add.append(elems["txtbx"])
@@ -578,7 +577,7 @@ def download_section():
 
                 with gr.Row(visible=False) as download_all_row:
                     dl_all_ckb = gr.Checkbox(
-                        label="Download All Files",
+                        label='下载全部文件',
                         value=False,
                         elem_id="ch_dl_all_ckb",
                         elem_classes="ch_vpadding"
@@ -588,7 +587,7 @@ def download_section():
             with gr.Row(elem_classes="flex-center"):
                 dl_preview_img = gr.Gallery(
                     show_label=True,
-                    label="Preview Image",
+                    label='预览图',
                     value=None,
                     elem_id="ch_dl_preview_img",
                     allow_preview=True,
@@ -610,7 +609,7 @@ def download_section():
     with gr.Row():
         with gr.Column(scale=2, elem_classes="justify-bottom"):
             dl_filename_txtbox = gr.Textbox(
-                label="Rename Model",
+                label='保存文件名',
                 value="",
                 lines=1,
                 max_lines=1,
@@ -618,7 +617,7 @@ def download_section():
                 elem_classes="ch_vpadding"
             )
             dl_extension_txtbox = gr.Textbox(
-                label="Model extension",
+                label='模型扩展名',
                 value="",
                 elem_id="ch_dl_extension_txtbox",
                 visible=False
@@ -626,7 +625,7 @@ def download_section():
 
         with gr.Column(elem_classes="justify-bottom"):
             dl_civitai_model_by_id_btn = gr.Button(
-                value="3. Download Model",
+                value='3. 下载模型',
                 elem_classes="ch_vmargin",
                 variant="primary",
                 elem_id="ch_download_model_button"
@@ -634,7 +633,7 @@ def download_section():
 
     with gr.Row():
         dl_log_md = gr.Markdown(
-            value="Check Console log for Downloading Status"
+            value='选择模型版本后开始下载，进度会显示在这里。'
         )
 
     # ====events====
@@ -735,8 +734,8 @@ def download_multiple_section():
         return gr.Textbox(
             lines=5,
             max_lines=100,
-            placeholder="Supports Model page URLs and Model Version page URLs.",
-            label="Models to download",
+            placeholder='支持模型页面链接和模型版本链接。',
+            label='待下载的模型',
             show_label=True,
             value=appended_urls
         )
@@ -782,7 +781,7 @@ def download_multiple_section():
 
         return gr.Dropdown(
             choices=subfolders,
-            label="Sub-folder",
+            label='保存子目录',
             value=subfolder,
             min_width=320,
             multiselect=False
@@ -944,73 +943,65 @@ def download_multiple_section():
                 else:
                     msg = e
 
-                output = f"An error has occurred while downloading: {msg}\n{e.args}"
+                output = f"下载过程中发生错误：{msg}\n{e.args}"
                 util.printD(output)
                 download_results.append(f" * {dl['model_name']}: {output}")
 
         download_results = "\n".join(download_results)
-        yield f"```\nCompleted:\n{download_results}\n```"
+        yield f"```\n已完成：\n{download_results}\n```"
         return
 
     with gr.Row():
-        gr.Markdown("""
-            Add URLs to the textbox, one per line, or enter them individually to the helper form to download multiple models. You can also add additional parameters by adding "::" after the URL, followed by a parameter.
-            Currently supported parameters:
-            * `AllFiles`: Downloads all model files, including unsupported files, from a model.
-            * `AllVersions`: Downloads every version of a model.
-            * `Subfolder`: Downloads the model files to a specified subdirectory of the model type folder. A lora with `Subfolder=style` will download to `models/Lora/style`. This option will fail if the subfolder does not already exist.
-            e.g., `https://civitai.red/models/XXXXXX::AllFiles::AllModels` would download every file from every version of a model with ID `XXXXXX`.
-            Parameters are not case-senstive.
-        """)
-    with gr.Accordion("Add to Batch Form"):
+        gr.Markdown('每行输入一个模型链接，也可通过下方表单添加。链接后可用双冒号附加参数：\n\n- `AllFiles`（全部文件）\n- `AllVersions`（全部版本）\n- `Subfolder=style`（保存到已存在的子目录）\n\n参数不区分大小写。')
+    with gr.Accordion('添加到批量下载'):
         with gr.Row():
-            gr.Markdown("### Add to Batch")
+            gr.Markdown('### 添加批量任务')
         with gr.Row():
             with gr.Column(scale=2, elem_classes="justify-bottom"):
                 dl_model_url_or_id_txtbox = gr.Textbox(
-                    label="Civitai URL",
+                    label='模型链接或编号',
                     lines=1,
                     max_lines=1,
                     value="",
-                    placeholder="Model URL",
+                    placeholder='模型页面链接',
                     elem_id="ch_dl_url"
                 )
             with gr.Column(elem_classes="justify-bottom"):
                 detect_model_type_btn = gr.Button(
-                    value="Detect Model Type",
+                    value='识别模型类型',
                     variant="primary",
                     elem_id="ch_detect_model_type"
                 )
         with gr.Row():
             with gr.Column():
-                all_files = gr.Checkbox(label="All Files", value=False)
+                all_files = gr.Checkbox(label='包含全部文件', value=False)
             with gr.Column():
-                all_versions = gr.Checkbox(label="All Versions", value=False)
+                all_versions = gr.Checkbox(label='包含全部版本', value=False)
         with gr.Row():
             dl_subfolder_drop = gr.Dropdown(
                     choices=[],
-                    label="Subfolder",
+                    label='保存子目录',
                     value="",
                     min_width=320,
                     multiselect=False
                 )
         with gr.Row():
-            add_to_batch_btn = gr.Button(value="Add to Batch", variant="primary")
+            add_to_batch_btn = gr.Button(value='加入批量列表', variant="primary")
     with gr.Row():
         urls_txtbox = gr.Textbox(
             lines=5,
             max_lines=100,
-            placeholder="Supports Model page URLs and Model Version page URLs.",
-            label="Models to download",
+            placeholder='支持模型页面链接和模型版本链接。',
+            label='待下载的模型',
             show_label=True
         )
 
     with gr.Row():
-        submit_btn = gr.Button(value="Download Models", variant="primary")
+        submit_btn = gr.Button(value='开始批量下载', variant="primary")
 
     with gr.Row():
         dl_all_log_md = gr.Markdown(
-            value="Additional info will be printed to the webui console output."
+            value='详细进度可在绘图服务的运行窗口查看。'
         )
 
     detect_model_type_btn.click(
@@ -1039,31 +1030,31 @@ def download_multiple_section():
 def scan_for_duplicates_section():
     """ Scan Duplicate Models Section """
     with gr.Column():
-        gr.Markdown("### Scan for duplicate models")
+        gr.Markdown('### 查找重复模型')
         with gr.Row():
             with gr.Column():
                 scan_dup_model_types_drop = gr.CheckboxGroup(
-                    choices=model_types,
-                    label="Model Types",
+                    choices=model_type_choices,
+                    label='模型类型',
                     value=model_types
                 )
         with gr.Row():
             with gr.Column(scale=2):
                 cached_hash_ckb = gr.Checkbox(
-                    label="Use Hash from Metadata (May have false-positives but can be useful if you've pruned models)",
+                    label='使用元数据中的哈希值（便于识别裁剪模型，但可能误判）',
                     value=False,
                     elem_id="ch_cached_hash_ckb"
                 )
             with gr.Column():
                 scan_dup_model_btn = gr.Button(
-                    value="Scan",
+                    value='开始扫描',
                     variant="primary",
                     elem_id="ch_scan_dup_model_civitai_btn"
                 )
 
         # with gr.Row():
         scan_dup_model_log_md = gr.HTML(
-            value="Scanning takes time, just wait. Check console log for details",
+            value='点击扫描后将在此显示进度；详细信息可在运行窗口查看。',
             elem_id="ch_scan_dup_model_log_md"
         )
 
@@ -1081,12 +1072,12 @@ def check_new_versions_section(js_msg_txtbox):
     """ Check models' new version section """
 
     with gr.Column():
-        gr.Markdown("### Check models' new version")
+        gr.Markdown('### 检查模型更新')
         with gr.Row():
             with gr.Column(scale=2):
                 model_types_ckbg = gr.CheckboxGroup(
-                    choices=model_types,
-                    label="Model Types",
+                    choices=model_type_choices,
+                    label='模型类型',
                     value=[
                         "ti", "hyper", "ckp", "lora", "lycoris"
                     ]
@@ -1094,7 +1085,7 @@ def check_new_versions_section(js_msg_txtbox):
         with gr.Row():
             with gr.Column(scale=2):
                 check_models_new_version_btn = gr.Button(
-                    value="Check New Version from Civitai",
+                    value='检查新版本',
                     variant="primary"
                 )
 
@@ -1102,7 +1093,7 @@ def check_new_versions_section(js_msg_txtbox):
             with gr.Column():
                 dl_new_version_log_md = gr.Markdown()
                 check_models_new_version_log_md = gr.HTML(
-                    "It takes time, just wait. Check console log for details"
+                    '正在检查模型，详细进度可在运行窗口查看。'
                 )
 
     # ====events====
@@ -1113,7 +1104,7 @@ def check_new_versions_section(js_msg_txtbox):
     )
 
     js_dl_model_new_version_btn = gr.Button(
-        value="Download Model's new version",
+        value='下载模型新版本',
         visible=False,
         elem_id="ch_js_dl_model_new_version_btn"
     )

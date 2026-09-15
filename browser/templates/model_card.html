@@ -1,28 +1,12 @@
-<div class="model_card" id="ch_${model_id}_card">
-    <div class="preview">
-        <a href="" onclick="ch_downloader(event, ${model_id})">
-            <div class="preview_container">
-                ${preview}
-            </div>
-        </a>
-        <div class="title">
-            ${name}
-        </div>
-        <div class="ux">
-            <a href="${url}" target="_blank" onclick="(function(e){e.stopPropagation()})(event)">🌐</a>
-        </div>
-        <div class="model_meta">
-            <span>
-                ${type}
-            </span>
-            <span class="model_base">
-                ${base_models}
-            </span>
+<article class="ch-browse-card" id="ch_${model_id}_card">
+    <a class="ch-browse-preview" href="${url}" target="_blank" rel="noopener noreferrer" aria-label="查看模型：${name}">${preview}</a>
+    <div class="ch-browse-body">
+        <strong class="ch-browse-title">${name}</strong>
+        <div class="ch-browse-meta"><span>${type}</span><span>${base_models}</span></div>
+        <details class="ch-browse-description"><summary>模型说明</summary><p>${description}</p></details>
+        <div class="ch-browse-actions">
+            <button type="button" onclick="ch_downloader(event, ${model_id})">选择版本与下载</button>
+            <a href="${url}" target="_blank" rel="noopener noreferrer">模型网页</a>
         </div>
     </div>
-    <div class="description">
-        <div class="text">
-            ${description}
-        </div>
-    </div>
-</div>
+</article>

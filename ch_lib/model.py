@@ -40,6 +40,7 @@ folders = {
     "lora": os.path.join(MODELS_PATH, "Lora"),
     "lycoris": os.path.join(MODELS_PATH, "LyCORIS"),
     "vae": os.path.join(MODELS_PATH, "VAE"),
+    "textencoder": os.path.join(MODELS_PATH, "text_encoder"),
     "controlnet": os.path.join(MODELS_PATH, "Controlnet"),
     "detection": os.path.join(MODELS_PATH, "adetailer"),
     "upscaler": os.path.join(MODELS_PATH, "ESRGAN"),

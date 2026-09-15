@@ -40,7 +40,10 @@ def calculate_stepback_delay_seconds(
 def request_get(
     url:str,
     headers:dict | None=None,
-    retries=0
+    retries=0,
+    *,
+    max_retries=MAX_RETRIES,
+    timeout=None,
 ) -> tuple[Literal[True], requests.Response] | tuple[Literal[False], str]:
     """
     Performs a GET request
@@ -57,11 +60,11 @@ def request_get(
             verify=False,
             headers=headers,
             proxies=util.PROXIES,
-            timeout=util.REQUEST_TIMEOUT
+            timeout=util.REQUEST_TIMEOUT if timeout is None else timeout
         )
 
-    except TimeoutError:
-        output = f"GET Request timed out for {url}"
+    except (TimeoutError, requests.RequestException):
+        output = "网络请求失败或超时，请稍后重试。"
         print(output)
         return (False, output)
 
@@ -78,13 +81,13 @@ def request_get(
         if status_code == 401:
             return (
                 False,
-                "This download requires Authentication. Please add an API Key to Civitai Helper's settings to continue this download. See [Wiki](https://github.com/zixaphir/Stable-Diffusion-Webui-Civitai-Helper/wiki/Civitai-API-Key) for details on how to create an API Key."
+                "此下载需要身份验证。请先在模型助手设置中填写网站访问密钥。"
             )
 
         if status_code == 416:
             response.raise_for_status()
 
-        if status_code != 404 and retries < MAX_RETRIES:
+        if status_code not in (400, 403, 404, 422) and retries < max_retries:
             retry_delay = calculate_stepback_delay_seconds(retries)
             util.printD(f"Retrying after {retry_delay} seconds")
 
@@ -95,10 +98,14 @@ def request_get(
             return request_get(
                 url,
                 headers,
-                retries + 1
+                retries + 1,
+                max_retries=max_retries,
+                timeout=timeout,
             )
 
-        return (False, reason)
+        messages = {400:"请求参数无效", 403:"访问被拒绝", 404:"模型或文件不存在", 422:"请求参数无法处理",
+                    429:"请求过于频繁，请稍后重试", 500:"服务器处理失败", 502:"服务暂时不可用", 503:"服务暂时不可用"}
+        return (False, f"{messages.get(status_code, '网络请求失败')}（{status_code}）")
 
     return (True, response)
 
@@ -297,7 +304,7 @@ def download_progress(
             util.warning(f"Failed to convert downloaded image to JPG: {conversion_error}")
             util.printD(f"Failed to convert downloaded image to JPG: {conversion_error}")
 
-    output = f"File Downloaded to: {file_path}"
+    output = f"文件已下载到：{file_path}"
     util.printD(output)
 
     yield (True, file_path)
