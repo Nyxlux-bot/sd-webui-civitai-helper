@@ -331,6 +331,19 @@ button.ch-card-menu-toggle:not(.ch-lobe-card > button) {
 #ch_search .ch-browse-actions button:focus-visible, #ch_search a:focus-visible { outline: 2px solid var(--link-text-color); outline-offset: 2px; }
 #ch_model_search_results .ch-browser-empty { padding: 32px 16px; text-align: center; }
 #tab_civitai_helper_browser [id^=ch_browser_] { min-width: 0; }
+/* UI-only reloads can retain the previous Python module's Dropdown info.
+   The input already carries the hint; keep cached Gradio descriptions from
+   adding a row or changing the label spacing. Do not hide the input wrapper. */
+#ch_browser_bases [data-testid="block-info"] + div:not(.wrap) {
+    display: none !important;
+}
+#ch_browser_bases [data-testid="block-info"].has-info {
+    margin-bottom: var(--spacing-lg);
+}
+#ch_browser_bases input::placeholder {
+    color: var(--input-placeholder-color) !important;
+    opacity: 1;
+}
 #tab_civitai_helper_browser .token { max-width: 100%; min-width: 0; }
 #tab_civitai_helper_browser .token > span { white-space: normal; overflow-wrap: anywhere; }
 
