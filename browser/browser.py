@@ -29,8 +29,7 @@ def make_ui():
     with gr.Row(equal_height=True):
         families = gr.Dropdown(label="底模系列", choices=family_choices(), value=[], multiselect=True, elem_id="ch_browser_families")
         base_models = gr.Dropdown(label="训练底模", choices=base_choices(), value=[], multiselect=True,
-                                  allow_custom_value=True, elem_id="ch_browser_bases",
-                                  info="可输入网站新增底模的准确名称；未选具体底模时搜索所选系列的全部底模。")
+                                  allow_custom_value=True, elem_id="ch_browser_bases")
         types = gr.Dropdown(label="模型类型", choices=MODEL_TYPE_CHOICES, value=[], multiselect=True, elem_id="ch_browser_types")
     with gr.Row(equal_height=True):
         period = gr.Dropdown(label="发布时间范围", choices=PERIOD_CHOICES, value="AllTime", elem_id="ch_browser_period")

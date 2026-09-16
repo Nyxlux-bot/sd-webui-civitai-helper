@@ -1011,6 +1011,32 @@ window.ch_refresh_cards = function() {
     }
 };
 
+function initBrowserBaseModelHint(root) {
+    const hint = '可输入网站新增底模的准确名称；未选具体底模时搜索所选系列的全部底模。';
+    let host = null;
+    const applyHint = () => {
+        const next = root.querySelector('#ch_browser_bases');
+        if (!next) return;
+        if (next !== host) {
+            host = next;
+            observer.disconnect();
+            observer.observe(host, { childList: true, subtree: true });
+        }
+        const input = host.querySelector('input');
+        if (input) {
+            input.placeholder = '选择或输入底模名称，留空不限';
+            input.title = hint;
+        }
+    };
+    // Gradio 4 has no Dropdown placeholder argument. Reapply if a family filter
+    // replaces its input, without observing unrelated page updates afterwards.
+    const observer = new MutationObserver(applyHint);
+    if (root.querySelector('#ch_browser_bases') || opts.ch_civitai_browser !== false) {
+        observer.observe(root, { childList: true, subtree: true });
+        applyHint();
+    }
+}
+
 onUiLoaded(() => {
     //get gradio version
     const gradio_ver = ch_gradio_version();
@@ -1019,6 +1045,7 @@ onUiLoaded(() => {
     window.ch_refresh_cards();
     let scheduled = false;
     const root = gradioApp();
+    initBrowserBaseModelHint(root);
     const observer = new MutationObserver(records => {
         const relevant = records.some(record => [...record.addedNodes].some(node =>
             node.nodeType === 1 && (node.matches('.card, .extra-network-cards, .extra-networks, [id$="-extra-network-sidebar"]') ||
